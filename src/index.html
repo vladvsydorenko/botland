@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #app {
+            border: 1px solid;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <form id="settings">
+            <label for="scale">Scale:</label>
+            <input name="scale" type="range" min="1" max="100" value="1" step="1">
+
+            <label for="offsetX">X offset:</label>
+            <input name="offsetX" type="range" min="1" max="800" value="1" step="1">
+
+            <label for="offsetY">Y offset:</label>
+            <input name="offsetY" type="range" min="1" max="600" value="1" step="1">
+        </form>
+    </div>
+    <canvas id="app" width="800" height="600"></canvas>
+</body>
+</html>
