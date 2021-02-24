@@ -59,42 +59,82 @@ const renderTextureToTexture = (source: Texture, target: Texture, sourceBounds: 
 
 console.log("worker is run");
 
+let randomLerp = 0.1;
+let randomChange = 2;
+let colorLerp = 0.5;
+let pixelLerp = 0.1;
+
+const randomChangeThreashold = 10;
+const minRandomLength = 100;
+const maxRandomLength = 10000;
+
 const generateRandoms = () => {
-    r = MathTools.lerp(r, 255 - (50 * Math.random()), 0.1);
-    g = MathTools.lerp(g, 255 - (100 * Math.random()), 0.1);
-    b = MathTools.lerp(b, 255 - (80 * Math.random()), 0.1);
-    a = MathTools.lerp(a, 255 - (10 * Math.random()), 0.001);
-    return new Array(1000).fill(0).map(v => Math.random());
+    const length = Math.floor(Math.random() * (maxRandomLength - minRandomLength) + minRandomLength);
+    return new Array(length).fill(0).map(v => Math.random());
 }
 
-let r = Math.floor(255 * Math.random());
-let g = Math.floor(255 * Math.random());
-let b = Math.floor(255 * Math.random());
+const changeColorTargets = () => {
+    rTarget = MathTools.lerp(rTarget, 180 * Math.random(), randomLerp);
+    gTarget = MathTools.lerp(gTarget, 180 * Math.random(), randomLerp);
+    bTarget = MathTools.lerp(bTarget, 180 * Math.random(), randomLerp);
+    aTarget = MathTools.lerp(aTarget, 255 - (255 * Math.random() * 0.2), randomLerp);
+};
+
+let r = Math.floor(180 * Math.random());
+let g = Math.floor(180 * Math.random());
+let b = Math.floor(180 * Math.random());
 let a = 255;
+
+let rTarget = Math.floor(255 * Math.random());
+let gTarget = Math.floor(255 * Math.random());
+let bTarget = Math.floor(255 * Math.random());
+let aTarget = Math.floor(255 * Math.random());
+
 let randoms = generateRandoms();
 let randomIndex = 0;
-let randomChange = 0;
 
 let updateCount = 0;
+
+changeColorTargets();
 const update = (testTexture: Texture, finalTexture: Texture) => {
     let random = 0;
+    let random2 = 0;
+    let random3 = 0;
+
+    changeColorTargets();
+
+    r = MathTools.lerp(r, rTarget, colorLerp);
+    g = MathTools.lerp(g, gTarget, colorLerp);
+    b = MathTools.lerp(b, bTarget, colorLerp);
+    a = MathTools.lerp(a, aTarget, colorLerp);
 
     for (let i = 0; i < testTexture.pixels.length; i+=4) {
-        random = randoms[randomIndex];
-
-        testTexture.pixels[i] = r * random;
-        testTexture.pixels[i + 1] = g * random;
-        testTexture.pixels[i + 2] = b * random;
-        testTexture.pixels[i + 3] = a;
+        testTexture.pixels[i] = MathTools.lerp(testTexture.pixels[i], r * random, pixelLerp);
+        testTexture.pixels[i + 1] = MathTools.lerp(testTexture.pixels[i + 1], g * random2, pixelLerp);
+        testTexture.pixels[i + 2] = MathTools.lerp(testTexture.pixels[i + 2], b * random3, pixelLerp);
+        testTexture.pixels[i + 3] = MathTools.lerp(testTexture.pixels[i + 3], a, pixelLerp);
+        // testTexture.pixels[i + 1] = g * random;
+        // testTexture.pixels[i + 2] = b * random;
+        // testTexture.pixels[i + 3] = a;
 
         randomChange++;
 
-        if (randomChange > 10) {
+        if (randomChange > randomChangeThreashold) {
             randomIndex++;
-            randomChange = 0;
-        }
-        if (randomIndex > randoms.length) {
-            randomIndex = 0;
+            random = randoms[randomIndex];
+
+            randomIndex++;
+            if (randomIndex > randoms.length) {
+                randomIndex = 0;
+            }
+            random2 = randoms[randomIndex];
+    
+            randomIndex++;
+            if (randomIndex > randoms.length) {
+                randomIndex = 0;
+            }
+            random3 = randoms[randomIndex];
+                randomChange = 0;
         }
     }
 
@@ -117,10 +157,10 @@ const update = (testTexture: Texture, finalTexture: Texture) => {
 
 let testTexture: Texture = null;
 
-testTexture = new Texture();
-testTexture.size = new Size2D(512, 512);
-const length = testTexture.size.width * testTexture.size.height;
-testTexture.pixels = new Uint8ClampedArray(new ArrayBuffer(length * Uint8ClampedArray.BYTES_PER_ELEMENT * 4));
+// testTexture = new Texture();
+// testTexture.size = new Size2D(800, 800);
+// const length = testTexture.size.width * testTexture.size.height;
+// testTexture.pixels = new Uint8ClampedArray(new ArrayBuffer(length * Uint8ClampedArray.BYTES_PER_ELEMENT * 4));
 
 
 self.addEventListener("message", (e) => {
@@ -132,7 +172,6 @@ self.addEventListener("message", (e) => {
     if (testTexture === null) {
         testTexture = new Texture();
         testTexture.size = finalTexture.size.clone();
-        testTexture.size = new Size2D(512, 512);
         const length = testTexture.size.width * testTexture.size.height;
         testTexture.pixels = new Uint8ClampedArray(new ArrayBuffer(length * Uint8ClampedArray.BYTES_PER_ELEMENT * 4));
     }

@@ -9,19 +9,13 @@ class Texture {
 }
 
 self.addEventListener("DOMContentLoaded", () => {
-    const renderSize = new Size2D(512, 512);
+    const renderSize = new Size2D(800, 600);
     
     const canvas = <HTMLCanvasElement>document.getElementById("app");
     canvas.width = renderSize.width;
     canvas.height = renderSize.height;
 
-    const hiddenCanvas = <HTMLCanvasElement>document.createElement("canvas");
-    hiddenCanvas.width = renderSize.width;
-    hiddenCanvas.height = renderSize.height;    
-
-    const ctx = canvas.getContext("2d");
-    let hiddenCtx = hiddenCanvas.getContext("2d");
-    hiddenCtx = canvas.getContext("2d");
+    let ctx = canvas.getContext("2d");
 
     const finalTexture = new Texture();
     finalTexture.size = renderSize.clone();
@@ -33,34 +27,34 @@ self.addEventListener("DOMContentLoaded", () => {
     let start = performance.now();
     const update = () => {
         const imageData = new ImageData(finalTexture.pixels, finalTexture.size.width, finalTexture.size.height);
-        hiddenCtx.putImageData(imageData, 0, 0);
+        ctx.putImageData(imageData, 0, 0);
 
-        hiddenCtx.globalAlpha = 0.7;
-        hiddenCtx.fillStyle = "#1a446a";
-        hiddenCtx.fillRect(renderSize.width - 84, 0, 84, 44);
+        ctx.globalAlpha = 0.7;
+        ctx.fillStyle = "#1a446a";
+        ctx.fillRect(renderSize.width - 84, 0, 84, 44);
 
-        hiddenCtx.textAlign = "center";
+        ctx.textAlign = "center";
 
-        hiddenCtx.globalAlpha = 0.1;
-        hiddenCtx.fillStyle = "#424242";
-        hiddenCtx.font = "normal bold 22px sans-serif";
-        hiddenCtx.fillText(lastFps.toString(), renderSize.width - 16, 34);
+        ctx.globalAlpha = 0.1;
+        ctx.fillStyle = "#424242";
+        ctx.font = "normal bold 22px sans-serif";
+        ctx.fillText(lastFps.toString(), renderSize.width - 16, 34);
 
-        hiddenCtx.globalAlpha = 0.2;
-        hiddenCtx.fillStyle = "#424242";
-        hiddenCtx.font = "normal bold 23px sans-serif";
-        hiddenCtx.fillText(lastFps.toString(), renderSize.width - 17, 35);
+        ctx.globalAlpha = 0.2;
+        ctx.fillStyle = "#424242";
+        ctx.font = "normal bold 23px sans-serif";
+        ctx.fillText(lastFps.toString(), renderSize.width - 17, 35);
 
-        hiddenCtx.globalAlpha = 1;
+        ctx.globalAlpha = 1;
         const fpsGreen = 255 * (lastFps / 60);
         const fpsRed = 255 - 255 * (lastFps / 30);
         const fpsBlue = 255 * (lastFps / 300);
-        hiddenCtx.fillStyle = `rgba(${fpsRed}, ${fpsGreen}, ${fpsBlue}, 1)`;
-        hiddenCtx.font = "normal bold 20px sans-serif";
-        hiddenCtx.fillText(lastFps.toString(), renderSize.width - 20, 30);
+        ctx.fillStyle = `rgba(${fpsRed}, ${fpsGreen}, ${fpsBlue}, 1)`;
+        ctx.font = "normal bold 20px sans-serif";
+        ctx.fillText(lastFps.toString(), renderSize.width - 20, 30);
 
-        hiddenCtx.fillStyle = "#d8dfe8";
-        hiddenCtx.fillText("fps:", renderSize.width - 60, 30);
+        ctx.fillStyle = "#d8dfe8";
+        ctx.fillText("fps:", renderSize.width - 60, 30);
 
         // const image = hiddenCtx.getImageData(0, 0, renderSize.width, renderSize.height);
         // ctx.putImageData(image, 0, 0);
